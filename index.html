@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Gráfico de posição em função do tempo</title>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <h1>Gráfico de posição em função do tempo</h1>
+
+    <canvas id="myChart"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="./script.js"></script>
+    <script>
+      function drawChart() {
+        const canvas = document.getElementById("myChart");
+        const ctx = canvas.getContext("2d");
+
+        // Define as margens do gráfico
+        const margin = 40;
+        const width = canvas.width - 2 * margin;
+        const height = canvas.height - 2 * margin;
+
+        // Obtém os dados da tabela
+        const table_data = Array.from(
+          document.querySelectorAll("table tbody tr")
+        ).map(function (row) {
+          return [
+            parseFloat(row.cells[0].textContent),
+            parseFloat(row.cells[1].textContent),
+          ];
+        });
+
+        // Separa os dados em listas de tempo e posição
+        const time_list = table_data.map(function (x) {
+          return x[0];
+        });
+        const position_list = table_data.map(function (x) {
+          return x[1];
+        });
+
+        // Encontra os valores mínimos e máximos de tempo e posição
+        const min_time = Math.min(...time_list);
+        const max_time = Math.max(...time_list);
+        const min_position = Math.min(...position_list);
+        const max_position = Math.max(...position_list);
+
+        // Define as escalas do gráfico
+        const time_scale = width / (max_time - min_time);
+        const position_scale = height / (max_position - min_position);
+
+        // Desenha o eixo x
+        ctx.beginPath();
+        ctx.moveTo(margin, canvas.height - margin);
+        ctx.lineTo(canvas.width - margin, canvas.height - margin);
+        ctx.stroke();
+
+        // Desenha o eixo y
+        ctx.beginPath();
+        ctx.moveTo(margin, margin);
+        ctx.lineTo(margin, canvas.height - margin);
+        ctx.stroke();
+
+        // Desenha os pontos do gráfico
+        ctx.beginPath();
+        ctx.moveTo(
+          margin + (time_list[0] - min_time) * time_scale,
+          canvas.height -
+            margin -
+            (position_list[0] - min_position) * position_scale
+        );
+        for (let i = 1; i < table_data.length; i++) {
+          ctx.lineTo(
+            margin + (time_list[i] - min_time) * time_scale,
+            canvas.height -
+              margin -
+              (position_list[i] - min_position) * position_scale
+          );
+        }
+        ctx.stroke();
+      }
+      drawChart();
+    </script>
+  </body>
+</html>
